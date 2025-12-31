@@ -3,12 +3,53 @@
 <head>
   <meta charset="utf-8">
   <title>My File Server</title>
+  <style>
+    body { font-family: Arial; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    h1 { text-align: center; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 6px; }
+    a { text-decoration: none; color: #0077cc; font-weight: bold; }
+    a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
   <h1>My File Server</h1>
-  <ul>
-    <li><a href="files/test.pdf">test.pdf</a></li>
-    <li><a href="files/data.json">data.json</a></li>
-  </ul>
+  <ul id="file-list">Loading files...</ul>
+
+  <script>
+    const username = 'supamitr-it';       // ชื่อ GitHub ของคุณ
+    const repo = 'FileAlien';      // ชื่อ repo ของคุณ
+    const folder = 'doc';            // โฟลเดอร์เก็บไฟล์
+    const baseUrl = `https://${username}.github.io/${repo}/${folder}/`;
+    const fileList = document.getElementById('file-list');
+
+    fetch(`https://api.github.com/repos/${username}/${repo}/contents/${folder}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!Array.isArray(data)) {
+          fileList.textContent = 'No files found.';
+          return;
+        }
+
+        // เรียงไฟล์ล่าสุดขึ้นบน
+        data.sort((a, b) => (a.sha > b.sha ? -1 : 1));
+
+        fileList.innerHTML = '';
+        data.forEach(file => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = baseUrl + encodeURIComponent(file.name);  // ลิงก์ GitHub Pages
+          a.textContent = file.name;
+          a.target = "_blank";              // เปิดในแท็บใหม่
+          a.rel = "noopener noreferrer";    // ปลอดภัย
+          li.appendChild(a);
+          fileList.appendChild(li);
+        });
+      })
+      .catch(err => {
+        fileList.textContent = 'Error loading files';
+        console.error(err);
+      });
+  </script>
 </body>
 </html>
