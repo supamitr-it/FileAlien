@@ -3,7 +3,7 @@ name: Generate files.json
 on:
   push:
     paths:
-      - "files/**"
+      - "doc/**"
 
 jobs:
   build:
