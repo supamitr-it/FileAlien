@@ -1,0 +1,39 @@
+name: Generate files.json
+
+on:
+  push:
+    paths:
+      - "files/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Generate files.json
+        run: |
+          echo "[" > files.json
+          first=true
+          for file in files/*; do
+            [ -f "$file" ] || continue
+            filename=$(basename "$file")
+            date=$(git log -1 --format=%cI -- "$file")
+            if [ "$first" = true ]; then
+              first=false
+            else
+              echo "," >> files.json
+            fi
+            echo "  { \"name\": \"$filename\", \"date\": \"$date\" }" >> files.json
+          done
+          echo "]" >> files.json
+
+      - name: Commit files.json
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add files.json
+          git commit -m "Auto update files.json" || echo "No changes"
+          git push
