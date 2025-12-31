@@ -7,9 +7,11 @@
     body { font-family: Arial; max-width: 800px; margin: 40px auto; padding: 0 20px; }
     h1 { text-align: center; }
     ul { list-style-type: none; padding: 0; }
-    li { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 6px; }
-    a { text-decoration: none; color: #0077cc; font-weight: bold; }
+    li { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; }
+    a { text-decoration: none; color: #0077cc; font-weight: bold; margin-right: 10px; }
     a:hover { text-decoration: underline; }
+    button { padding: 4px 8px; border: none; background: #0077cc; color: #fff; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #005fa3; }
   </style>
 </head>
 <body>
@@ -17,9 +19,9 @@
   <ul id="file-list">Loading files...</ul>
 
   <script>
-    const username = 'supamitr-it';       // ชื่อ GitHub ของคุณ
-    const repo = 'FileAlien';      // ชื่อ repo ของคุณ
-    const folder = 'doc';            // โฟลเดอร์เก็บไฟล์
+    const username = 'supamitr-it';
+    const repo = 'filealien';
+    const folder = 'doc';
     const baseUrl = `https://${username}.github.io/${repo}/${folder}/`;
     const fileList = document.getElementById('file-list');
 
@@ -34,15 +36,30 @@
         // เรียงไฟล์ล่าสุดขึ้นบน
         data.sort((a, b) => (a.sha > b.sha ? -1 : 1));
 
+        // แสดงเฉพาะ 100 ไฟล์ล่าสุด
+        const latest100 = data.slice(0, 100);
+
         fileList.innerHTML = '';
-        data.forEach(file => {
+        latest100.forEach(file => {
           const li = document.createElement('li');
+
+          // ชื่อไฟล์เป็นลิงก์เปิดแท็บใหม่
           const a = document.createElement('a');
-          a.href = baseUrl + encodeURIComponent(file.name);  // ลิงก์ GitHub Pages
+          a.href = baseUrl + encodeURIComponent(file.name);
           a.textContent = file.name;
-          a.target = "_blank";              // เปิดในแท็บใหม่
-          a.rel = "noopener noreferrer";    // ปลอดภัย
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+
+          // ปุ่ม copy link เงียบ ๆ
+          const btn = document.createElement('button');
+          btn.textContent = "Copy Link";
+          btn.onclick = () => {
+            navigator.clipboard.writeText(baseUrl + encodeURIComponent(file.name))
+              .catch(() => console.error('Failed to copy link'));
+          };
+
           li.appendChild(a);
+          li.appendChild(btn);
           fileList.appendChild(li);
         });
       })
