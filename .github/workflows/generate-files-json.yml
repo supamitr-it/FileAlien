@@ -17,7 +17,7 @@ jobs:
         run: |
           echo "[" > files.json
           first=true
-          for file in files/*; do
+          for file in doc/*; do
             [ -f "$file" ] || continue
             filename=$(basename "$file")
             date=$(git log -1 --format=%cI -- "$file")
